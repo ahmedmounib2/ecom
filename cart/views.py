@@ -77,6 +77,8 @@ def cart_delete(request):
         cart.delete(product=product_id)
         # Prepare JSON response
         response = JsonResponse({'success': 'Product removed from cart successfully'})
+        messages.success(request, "Item Deleted From Shopping Cart...")
+
         return response
     else:
         # If product ID is not found in POST data, return an error response

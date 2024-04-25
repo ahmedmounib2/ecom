@@ -10,6 +10,7 @@ urlpatterns = [
   path('popular/', views.popular_items, name='popular_items'),
   path('new-arrivals/', views.new_arrivals, name='new_arrivals'),
   path('register/', views.register_user, name='register'),
+  path('update_user/', views.update_user, name='update_user'),
   path('product/ <int:pk>', views.product, name='product'),
   path('category/ <str:foo>', views.category, name='category'),
   path('category_summary/', views.category_summary, name='category_summary'),

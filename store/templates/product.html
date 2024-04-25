@@ -77,6 +77,8 @@
             },
             success: function(json){
                 document.getElementById("cart_quantity").textContent = json.qty;
+                location.reload();
+
                 // Log success message to console
                 // console.log('Product added to cart successfully:', json);
                 // You can handle success response here if needed
