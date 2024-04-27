@@ -1,15 +1,30 @@
 from django.shortcuts import render, redirect
 from .models import Product, Category
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib import messages
 from .models import Product
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
-from .forms import SignUpForm, UpdateUserForm
+from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
+from .forms import SignUpForm, UpdateUserForm, ChangePasswordForm
 from django import forms
 
-
-
+def update_password(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            form = ChangePasswordForm(request.user, request.POST)
+            if form.is_valid():
+                user = form.save()
+                update_session_auth_hash(request, user)  # Important to update the session with new password hash
+                messages.success(request, 'Your password was successfully updated!')
+                return redirect('update_user')
+            else:
+                messages.error(request, 'Please correct the error below.')
+        else:
+            form = PasswordChangeForm(request.user)
+        return render(request, 'update_password.html', {'form': form})
+    else:
+        messages.error(request, 'You must be logged in to view this page.')
+        return redirect('home')
 
 def update_user(request):
     if request.user.is_authenticated:
