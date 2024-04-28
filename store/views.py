@@ -1,12 +1,34 @@
 from django.shortcuts import render, redirect
-from .models import Product, Category
+from .models import Product, Category, Profile
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib import messages
 from .models import Product
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
-from .forms import SignUpForm, UpdateUserForm, ChangePasswordForm
+from .forms import SignUpForm, UpdateUserForm, ChangePasswordForm, UserInfoForm
 from django import forms
+
+def update_info(request):
+    if request.user.is_authenticated:
+        current_user = Profile.objects.get(user__id=request.user.id)
+        form = UserInfoForm(request.POST or None, instance=current_user)
+
+        if request.method == 'POST':
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Your Info Has Been Updated!")
+                return redirect('home')
+            else:
+                messages.error(request, "Failed to update user info. Please check the form.")
+                return render(request, "update_info.html", {"form": form})
+        
+        return render(request, "update_info.html", {"form": form})
+    
+    else: 
+        messages.error(request, "You Must Be Logged In to Access This Page!!..")
+        return redirect('home')
+    
+
 
 def update_password(request):
     if request.user.is_authenticated:
@@ -138,8 +160,8 @@ def register_user(request):
             # log in user
             user = authenticate(username=username, password=password)
             login(request, user)
-            messages.success(request,("You have Registered successfully."))
-            return redirect("home")
+            messages.success(request,("Username created, please fill out your Info Below.."))
+            return redirect("update_info")
         else:
             messages.success(request,("Whoooops!, There was a problem, please try again"))
             return redirect('register')
