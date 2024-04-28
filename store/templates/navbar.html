@@ -9,7 +9,8 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
                 <!-- Highlight the active page in the navbar -->
                 <li class="nav-item"><a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}">Home</a></li>
-                <!-- Use 'href="{% url 'about' %}"' to generate the URL for the about page -->
+                <li class="nav-item"><a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'search' %}">Search</a></li>
+
                 <li class="nav-item"><a class="nav-link {% if request.path == 'about' %}active{% endif %}" href="{% url 'about' %}">About</a></li>
 
                 {% if user.is_authenticated %}
