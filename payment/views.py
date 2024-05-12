@@ -4,14 +4,15 @@ from payment.forms import ShippingForm, PaymentForm
 from payment.models import ShippingAddress, Order, OrderItem
 from django.contrib import messages
 from django.contrib.auth.models import User, AnonymousUser
+from store.models import Product
 
 
 def process_order(request):
     if request.method == 'POST':
         # Get the cart
         cart = Cart(request)
-        cart_products = cart.get_prods
-        quantities = cart.get_quants
+        cart_products = cart.get_prods()  # Call the function to get cart products
+        quantities = cart.get_quants()  # Call the function to get quantities
         totals = cart.cart_total()
 
         # Get billing info from the form
@@ -40,8 +41,23 @@ def process_order(request):
             # For anonymous users, assign None or some default value to user
             user = None
 
-        create_order = Order(user=user, full_name=full_name, email=email, shipping_address=shipping_address, amount_paid=amount_paid)
-        create_order.save()
+        create_order = Order.objects.create(user=user, full_name=full_name, email=email, shipping_address=shipping_address, amount_paid=amount_paid)
+
+        # add order items
+        # get the order ID
+        order_id = create_order.pk
+        for product in cart_products:
+            product_id = product.id
+            if product.is_sale:
+                price = product.sale_price
+            else:
+                price = product.price
+
+            # get product info
+            for key, value in quantities.items():
+                if int(key) == product.id:
+                    create_order_item = OrderItem(order=create_order, product=product, user=user, quantity=value, price=price)  # Use create_order instead of order_id
+                    create_order_item.save()
 
         messages.success(request, "Order Placed")
         return redirect('home')
