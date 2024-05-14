@@ -59,6 +59,12 @@ def process_order(request):
                     create_order_item = OrderItem(order=create_order, product=product, user=user, quantity=value, price=price)  # Use create_order instead of order_id
                     create_order_item.save()
 
+        # delete our cart after order is processed
+        for key in list(request.session.keys()):
+            if key == "session_key":
+                del request.session[key]
+        
+
         messages.success(request, "Order Placed")
         return redirect('home')
     
